@@ -6,8 +6,8 @@ import datetime
 import discord
 from discord.ext import tasks, commands
 
-from Modules import PublishSheets
-from Modules import Raidhelper2Sheets
+
+from Modules.ExportRaidHelper import ExportRaidHelper
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
@@ -18,50 +18,6 @@ logger.addHandler(handler)
 locale.setlocale(locale.LC_TIME, "de_DE.utf8")
 
 
-class WrongChannel(commands.CheckFailure):
-    pass
-
-
-def is_in_channel(channelname):
-    async def predicate(ctx):
-        if not ctx.channel.name == channelname:
-            raise WrongChannel(f'Dieser Befehl funktioniert nur im Channel "{channelname}"')
-        return True
-    return commands.check(predicate)
-
-class ExportRaidHelper(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.command()
-    @is_in_channel('offi-chat')
-    async def ExportEvent(self, ctx, eventID):
-        progress = await ctx.send(f'Export gestartet.')
-        response = Raidhelper2Sheets.export_data_to_google(eventID)
-        print(response)
-        if response[0] == 'OK':
-            await ctx.send(
-                f'Anmeldungen für {response[1].strftime("%A den %d.%m.%Y")} erfolgreich exportiert. Hier der Link: {response[2]} \n Um den Kader zu veröffentlichen den folgenden Befehl ausführen: $ExportKader "{response[3]}"')
-        else:
-            await ctx.send('Es ist ein Fehler aufgetreten. Bitte melde dich bei <@!269164316832432128>')
-        await progress.delete()
-
-    @commands.command()
-    @is_in_channel('offi-chat')
-    async def ExportKader(self, ctx, sheet_name):
-        progress = await ctx.send(f'Veröffentlichung gestartet.')
-        response = PublishSheets.publishsheets(sheet_name)
-        if response[0] == 'OK':
-            channel = discord.utils.get(ctx.guild.channels, name='ankündigungen')
-            mention = discord.utils.get(ctx.guild.roles, name='Mah Oida')
-            await channel.send(f'{mention.mention} Hier der Kader für morgen: {response[1]}')
-            await ctx.send(f'Kader in {channel.name} veröffentlicht')
-        await progress.delete()
-
-    @ExportEvent.error
-    async def export_error(self, ctx, error):
-        if isinstance(error, WrongChannel):
-            await ctx.send(error)
 
 class Sonstiges(commands.Cog):
     def __init__(self, bot):
@@ -81,7 +37,6 @@ class Sonstiges(commands.Cog):
             return
 
     @commands.command()
-    @is_in_channel('offi-chat')
     async def test(self, ctx, arg=None):
         working_messing = await ctx.send(f'test gestartet.')
         await ctx.message.delete()
@@ -98,6 +53,8 @@ class Sonstiges(commands.Cog):
 class ChannelManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.categorychannel = None
+        self.guild = None
         self.created_channels_mythic = []
         self.created_channels_other = []
         self.created_channels_pvp = []
@@ -107,21 +64,19 @@ class ChannelManager(commands.Cog):
     def get_M_channels(self):
         voice_channels = {}
         for channel in self.bot.get_all_channels():
-            if channel.type == discord.ChannelType.voice and 'M+' in channel.name:
+            if channel.type == discord.ChannelType.voice and '⏳ M+' in channel.name:
                 voice_channels.update({channel.name: channel})
             else:
                 continue
-        #print(voice_channels)
         return voice_channels
 
     def get_PvP_channels(self):
         voice_channels = {}
         for channel in self.bot.get_all_channels():
-            if channel.type == discord.ChannelType.voice and 'PvP blasten' in channel.name:
+            if channel.type == discord.ChannelType.voice and '⚡ PvP blasten' in channel.name:
                 voice_channels.update({channel.name: channel})
             else:
                 continue
-        print(voice_channels)
         return voice_channels
 
     def get_other_channels(self):
@@ -141,6 +96,9 @@ class ChannelManager(commands.Cog):
         m_channels = self.get_M_channels()
         empty_channels = 0
         deletable_channels = []
+        if '⏳ M+' not in m_channels.keys():
+            await self.guild.create_voice_channel(name='⏳ M+', category=self.categorychannel, position=2, bitrate=96000)
+            return
         for channelname in m_channels.keys():
             if m_channels[channelname].members == []:
                 empty_channels += 1
@@ -151,8 +109,10 @@ class ChannelManager(commands.Cog):
             while not created:
                 new_channelname = f'⏳ M+ {i}'
                 if not new_channelname in m_channels.keys():
-                    new_channel = await m_channels['⏳ M+ 1'].clone(name=new_channelname)
-                    await new_channel.edit(position=m_channels['⏳ M+ 1'].position+i-1)
+                    new_channel = await self.guild.create_voice_channel(name=new_channelname,
+                                                                        category=self.categorychannel,
+                                                                        position=2 + i - 2,
+                                                                        bitrate=96000)
                     self.created_channels_mythic.append(new_channel)
                     created = True
                 else:
@@ -161,7 +121,7 @@ class ChannelManager(commands.Cog):
         i = 0
         while empty_channels > 1:
             channel = deletable_channels[i]
-            if channel in self.created_channels_mythic:
+            if channel in self.created_channels_mythic or not channel.name == '⏳ M+':
                 await channel.delete()
                 empty_channels -= 1
                 deletable_channels.remove(channel)
@@ -173,6 +133,10 @@ class ChannelManager(commands.Cog):
         pvp_channels = self.get_PvP_channels()
         empty_channels = 0
         deletable_channels = []
+        if '⚡ PvP blasten' not in pvp_channels.keys():
+            await self.guild.create_voice_channel(name='⚡ PvP blasten', category=self.categorychannel, position=2+len(self.get_M_channels()),
+                                                 bitrate=96000)
+            return
         for channelname in pvp_channels.keys():
             if pvp_channels[channelname].members == []:
                 empty_channels += 1
@@ -183,8 +147,9 @@ class ChannelManager(commands.Cog):
             while not created:
                 new_channelname = f'⚡ PvP blasten {i}'
                 if not new_channelname in pvp_channels.keys():
-                    new_channel = await pvp_channels['⚡ PvP blasten'].clone(name=new_channelname)
-                    await new_channel.edit(position=pvp_channels['⚡ PvP blasten'].position + i - 1)
+                    new_channel = await self.guild.create_voice_channel(name=new_channelname,
+                                                                        category=self.categorychannel, position=2+len(self.get_M_channels())+i-2,
+                                                                        bitrate=96000)
                     self.created_channels_pvp.append(new_channel)
                     created = True
                 else:
@@ -193,13 +158,17 @@ class ChannelManager(commands.Cog):
         i = 0
         while empty_channels > 1:
             channel = deletable_channels[i]
-            if channel in self.created_channels_pvp:
+            if channel in self.created_channels_pvp or not channel.name == '⚡ PvP blasten':
                 await channel.delete()
                 empty_channels -= 1
                 deletable_channels.remove(channel)
-                self.created_channels_pvp.remove(channel)
+                if not self.created_channels_pvp == []:
+                    self.created_channels_pvp.remove(channel)
+
             else:
                 i += 1
+
+
     async def create_other_channel(self):
         m_channels = self.get_other_channels()
         empty_channels = 0
@@ -245,6 +214,13 @@ class ChannelManager(commands.Cog):
     async def before_channelcreator(self):
         print('waiting...')
         await self.bot.wait_until_ready()
+
+        guilds = []
+        async for guild in self.bot.fetch_guilds():
+            guilds.append(guild)
+        self.guild = guilds[0]
+        test = await guilds[0].fetch_channels()
+        self.categorychannel = discord.utils.get(test, name='🌌 World of Warcraft 🌌')
         print('Starting Loop...')
 
 
