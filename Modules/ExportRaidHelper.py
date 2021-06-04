@@ -1,18 +1,9 @@
 from discord.ext import commands
+import discord
 from Modules import PublishSheets
 from Modules import Raidhelper2Sheets
+from Modules.helpers import is_in_channel, WrongChannel
 
-
-class WrongChannel(commands.CheckFailure):
-    pass
-
-
-def is_in_channel(channelname):
-    async def predicate(ctx):
-        if not ctx.channel.name == channelname:
-            raise WrongChannel(f'Dieser Befehl funktioniert nur im Channel "{channelname}"')
-        return True
-    return commands.check(predicate)
 
 
 class ExportRaidHelper(commands.Cog):
