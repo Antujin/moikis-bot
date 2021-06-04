@@ -2,7 +2,9 @@ from discord.ext import commands
 import discord
 from Modules import PublishSheets
 from Modules import Raidhelper2Sheets
+from Modules import RaidhelperStrawpolls
 from Modules.helpers import is_in_channel, WrongChannel
+import datetime
 
 
 
@@ -34,6 +36,20 @@ class ExportRaidHelper(commands.Cog):
             await channel.send(f'{mention.mention} Hier der Kader für morgen: {response[1]}')
             await ctx.send(f'Kader in {channel.name} veröffentlicht')
         await progress.delete()
+
+    @commands.command()
+    @is_in_channel('offi-chat')
+    async def EvalPoll(self, ctx, poll_id):
+        question, answers, total_responses = RaidhelperStrawpolls.read_data_from_api(poll_id)
+        embed = discord.Embed(title=f'Strawpoll Ergebnisse bei {total_responses} Abstimmenden',
+                              description=question,
+                              color=0x0000ff)
+        for answer in answers.keys():
+            embed.add_field(name=f' {answers[answer]["text"]}: {answers[answer]["count"]} Stimmmen ({round(answers[answer]["count"]/total_responses*100,2)}%)',
+                            value='\n'.join(answers[answer]['voters']), inline=True)
+
+        await ctx.send(f"Ausgewertet am {datetime.datetime.now().strftime('%d.%m.%Y um %H:%M Uhr')}", embed=embed)
+
 
     @ExportEvent.error
     async def export_error(self, ctx, error):

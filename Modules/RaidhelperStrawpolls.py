@@ -4,7 +4,6 @@ import datetime
 import json
 
 
-
 def read_data_from_api(event_id):
     result = {}
     answers = {}
@@ -21,13 +20,12 @@ def read_data_from_api(event_id):
         answers.update({chr(65+i): {'text': answer,
                                     'count': 0,
                                     'voters': []
-                                    },
-                        'total_answers': len(response['raidusers'])})
+                                    }})
     for user in response['raidusers']:
         vote = user['spec'][0]
         answers[vote]['voters'].append(user['username'].replace('**', ''))
         answers[vote]['count'] += 1
-    return answers
+    return question, answers, len(response['raidusers'])
 
 
 if __name__ == '__main__':
