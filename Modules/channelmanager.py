@@ -157,7 +157,7 @@ class ChannelManager(commands.Cog):
                 i += 1
 
 
-    @tasks.loop(seconds=2)
+    @tasks.loop(seconds=5)
     async def channelcreator(self):
         await self.create_mythic_channel()
         await self.create_pvp_channel()
@@ -167,7 +167,6 @@ class ChannelManager(commands.Cog):
     async def before_channelcreator(self):
         print('waiting...')
         await self.bot.wait_until_ready()
-        time.sleep(120)
         guilds = []
         async for guild in self.bot.fetch_guilds():
             guilds.append(guild)
