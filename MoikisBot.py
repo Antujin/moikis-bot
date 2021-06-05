@@ -18,7 +18,9 @@ logger.addHandler(handler)
 
 locale.setlocale(locale.LC_TIME, "de_DE.utf8")
 
-bot = commands.Bot(command_prefix='$')
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 @bot.event
 async def on_ready():
