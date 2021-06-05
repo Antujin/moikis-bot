@@ -1,5 +1,6 @@
 from discord.ext import commands, tasks
 import discord
+import time
 
 class ChannelManager(commands.Cog):
     def __init__(self, bot):
@@ -165,7 +166,7 @@ class ChannelManager(commands.Cog):
     async def before_channelcreator(self):
         print('waiting...')
         await self.bot.wait_until_ready()
-
+        time.sleep(120)
         guilds = []
         async for guild in self.bot.fetch_guilds():
             guilds.append(guild)
