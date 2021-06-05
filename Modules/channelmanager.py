@@ -77,7 +77,8 @@ class ChannelManager(commands.Cog):
                 await channel.delete()
                 empty_channels -= 1
                 deletable_channels.remove(channel)
-                self.created_channels_mythic.remove(channel)
+                if not self.created_channels_mythic == []:
+                    self.created_channels_mythic.remove(channel)
             else:
                 i += 1
 
