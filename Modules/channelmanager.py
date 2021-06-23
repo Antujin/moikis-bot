@@ -5,6 +5,8 @@ import time
 class ChannelManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.pvp_position = 0
+        self.m_position = 0
         self.categorychannel = None
         self.guild = None
         self.created_channels_mythic = []
@@ -51,6 +53,7 @@ class ChannelManager(commands.Cog):
         if '⏳ M+' not in m_channels.keys():
             await self.guild.create_voice_channel(name='⏳ M+', category=self.categorychannel, position=2, bitrate=96000)
             return
+        self.m_position = m_channels['⏳ M+'].position
         for channelname in m_channels.keys():
             if m_channels[channelname].members == []:
                 empty_channels += 1
@@ -63,7 +66,7 @@ class ChannelManager(commands.Cog):
                 if not new_channelname in m_channels.keys():
                     new_channel = await self.guild.create_voice_channel(name=new_channelname,
                                                                         category=self.categorychannel,
-                                                                        position=2 + i - 2,
+                                                                        position=self.m_position + i - 1,
                                                                         bitrate=96000)
                     self.created_channels_mythic.append(new_channel)
                     created = True
@@ -90,6 +93,7 @@ class ChannelManager(commands.Cog):
             await self.guild.create_voice_channel(name='⚡ PvP blasten', category=self.categorychannel, position=2+len(self.get_M_channels()),
                                                  bitrate=96000)
             return
+        self.pvp_position = pvp_channels['⚡ PvP blasten'].position
         for channelname in pvp_channels.keys():
             if pvp_channels[channelname].members == []:
                 empty_channels += 1
@@ -101,7 +105,7 @@ class ChannelManager(commands.Cog):
                 new_channelname = f'⚡ PvP blasten {i}'
                 if not new_channelname in pvp_channels.keys():
                     new_channel = await self.guild.create_voice_channel(name=new_channelname,
-                                                                        category=self.categorychannel, position=2+len(self.get_M_channels())+i-2,
+                                                                        category=self.categorychannel, position=self.pvp_position+i-1,
                                                                         bitrate=96000)
                     self.created_channels_pvp.append(new_channel)
                     created = True
