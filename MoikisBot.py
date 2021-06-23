@@ -9,6 +9,7 @@ from discord.ext import tasks, commands
 from Modules.ExportRaidHelper import ExportRaidHelper
 from Modules.channelmanager import ChannelManager
 from Modules.feedback import Feedback
+from Modules.RoleManagement import RoleManager
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
@@ -20,6 +21,7 @@ locale.setlocale(locale.LC_TIME, "de_DE.utf8")
 
 intents = discord.Intents.default()
 intents.members = True
+intents.reactions = True
 bot = commands.Bot(command_prefix='$', intents=intents)
 
 @bot.event
@@ -29,6 +31,7 @@ async def on_ready():
 bot.add_cog(ExportRaidHelper(bot))
 bot.add_cog(Feedback(bot))
 bot.add_cog(ChannelManager(bot))
+bot.add_cog(RoleManager(bot))
 
 DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
 if DISCORD_TOKEN == None:
