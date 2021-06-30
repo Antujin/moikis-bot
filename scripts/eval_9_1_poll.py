@@ -103,7 +103,7 @@ def EvalPoll():
                 ranges.append([user['name'], user['fmt']])
             elif user['role'] == 'Melee DPS':
                 melees.append([user['name'], user['fmt']])
-            elif user['role'] == 'Healer':
+            elif user['role'] == 'Heiler':
                 healer.append([user['name'], user['fmt']])
             elif user['role'] == 'Tank':
                 tanks.append([user['name'], user['fmt']])
