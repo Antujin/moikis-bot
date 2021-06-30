@@ -31,7 +31,7 @@ class ExportRaidHelper(commands.Cog):
         progress = await ctx.send(f'Veröffentlichung gestartet.')
         response = PublishSheets.publishsheets(sheet_name)
         if response[0] == 'OK':
-            channel = discord.utils.get(ctx.guild.channels, name='ankündigungen')
+            channel = discord.utils.get(ctx.guild.channels, name='kader')
             mention = discord.utils.get(ctx.guild.roles, name='Mah Oida')
             await channel.send(f'{mention.mention} Hier der Kader für morgen: {response[1]}')
             await ctx.send(f'Kader in {channel.name} veröffentlicht')
