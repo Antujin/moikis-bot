@@ -67,6 +67,7 @@ class ChannelManager(commands.Cog):
                     new_channel = await self.guild.create_voice_channel(name=new_channelname,
                                                                         category=self.categorychannel,
                                                                         position=self.m_position + i - 1,
+                                                                        user_limit=5,
                                                                         bitrate=96000)
                     self.created_channels_mythic.append(new_channel)
                     created = True
