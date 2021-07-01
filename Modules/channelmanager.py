@@ -74,7 +74,7 @@ class ChannelManager(commands.Cog):
                                                                         user_limit=5,
                                                                         bitrate=96000)
                     if self.main_pvp_channel is not None:
-                        new_channel.move(after=self.main_pvp_channel)
+                        await new_channel.move(after=self.main_pvp_channel)
                     self.created_channels_mythic.append(new_channel)
                     created = True
                 else:
@@ -117,7 +117,7 @@ class ChannelManager(commands.Cog):
                                                                         category=self.categorychannel, position=self.pvp_position+i-1,
                                                                         bitrate=96000)
                     if self.after_pvp_channel is not None:
-                        new_channel.move(after=self.after_pvp_channel)
+                        await new_channel.move(after=self.after_pvp_channel)
                     self.created_channels_pvp.append(new_channel)
                     created = True
                 else:
