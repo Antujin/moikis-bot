@@ -82,9 +82,9 @@ class ChannelManager(commands.Cog):
                                                                         position=self.m_position + i - 1,
                                                                         bitrate=96000)
                     if i == 2:
-                        await new_channel.move(before=m_channels['⏳ M+'])
+                        await new_channel.move(before=m_channels['⏳ M+'], category=self.categorychannel)
                     if i >= 3:
-                        await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'])
+                        await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'], category=self.categorychannel)
                     self.created_channels_mythic.append(new_channel)
                     created = True
                 else:
@@ -128,9 +128,9 @@ class ChannelManager(commands.Cog):
                                                                         bitrate=96000)
 
                     if i == 2:
-                        await new_channel.move(before=m_channels['⏳ M+ DND'])
+                        await new_channel.move(before=m_channels['⏳ M+ DND'], category=self.categorychannel)
                     if i >= 3:
-                        await new_channel.move(before=m_channels[f'⏳ M+ {i-1} DND'])
+                        await new_channel.move(before=m_channels[f'⏳ M+ {i-1} DND'], category=self.categorychannel)
                     self.created_channels_DND_mythic.append(new_channel)
                     created = True
                 else:
@@ -173,9 +173,9 @@ class ChannelManager(commands.Cog):
                                                                         bitrate=96000)
                     if self.after_pvp_channel is not None:
                         if i == 2:
-                            await new_channel.move(before=pvp_channels['⚡ PvP blasten'])
+                            await new_channel.move(before=pvp_channels['⚡ PvP blasten'], category=self.categorychannel)
                         if i >= 3:
-                           await new_channel.move(before=pvp_channels[f'⚡ PvP blasten {i-1}'])
+                           await new_channel.move(before=pvp_channels[f'⚡ PvP blasten {i-1}'], category=self.categorychannel)
                     self.created_channels_pvp.append(new_channel)
                     created = True
                 else:
