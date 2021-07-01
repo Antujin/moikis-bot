@@ -9,6 +9,8 @@ class ChannelManager(commands.Cog):
         self.m_position = 0
         self.categorychannel = None
         self.guild = None
+        self.main_pvp_channel = None
+        self.after_pvp_channel = None
         self.created_channels_mythic = []
         self.created_channels_other = []
         self.created_channels_pvp = []
@@ -29,6 +31,8 @@ class ChannelManager(commands.Cog):
         for channel in self.bot.get_all_channels():
             if channel.type == discord.ChannelType.voice and '⚡ PvP blasten' in channel.name:
                 voice_channels.update({channel.name: channel})
+            elif channel.type == discord.ChannelType.voice and channel.name == '🍻 Therapietheke':
+                self.after_pvp_channel = channel
             else:
                 continue
         return voice_channels
@@ -51,7 +55,7 @@ class ChannelManager(commands.Cog):
         empty_channels = 0
         deletable_channels = []
         if '⏳ M+' not in m_channels.keys():
-            await self.guild.create_voice_channel(name='⏳ M+', category=self.categorychannel, position=2, bitrate=96000)
+            await self.guild.create_voice_channel(name='⏳ M+', category=self.categorychannel, position=2, user_limit=5, bitrate=96000)
             return
         self.m_position = m_channels['⏳ M+'].position
         for channelname in m_channels.keys():
@@ -69,6 +73,8 @@ class ChannelManager(commands.Cog):
                                                                         position=self.m_position + i - 1,
                                                                         user_limit=5,
                                                                         bitrate=96000)
+                    if self.main_pvp_channel is not None:
+                        new_channel.move(after=self.main_pvp_channel)
                     self.created_channels_mythic.append(new_channel)
                     created = True
                 else:
@@ -91,9 +97,11 @@ class ChannelManager(commands.Cog):
         empty_channels = 0
         deletable_channels = []
         if '⚡ PvP blasten' not in pvp_channels.keys():
-            await self.guild.create_voice_channel(name='⚡ PvP blasten', category=self.categorychannel, position=2+len(self.get_M_channels()),
+            self.main_pvp_channel = await self.guild.create_voice_channel(name='⚡ PvP blasten', category=self.categorychannel, position=2+len(self.get_M_channels()),
                                                  bitrate=96000)
             return
+        if self.main_pvp_channel is None:
+            self.main_pvp_channel = pvp_channels['⚡ PvP blasten']
         self.pvp_position = pvp_channels['⚡ PvP blasten'].position
         for channelname in pvp_channels.keys():
             if pvp_channels[channelname].members == []:
@@ -108,6 +116,8 @@ class ChannelManager(commands.Cog):
                     new_channel = await self.guild.create_voice_channel(name=new_channelname,
                                                                         category=self.categorychannel, position=self.pvp_position+i-1,
                                                                         bitrate=96000)
+                    if self.after_pvp_channel is not None:
+                        new_channel.move(after=self.after_pvp_channel)
                     self.created_channels_pvp.append(new_channel)
                     created = True
                 else:
