@@ -12,6 +12,7 @@ class ChannelManager(commands.Cog):
         self.guild = None
         self.main_pvp_channel = None
         self.after_pvp_channel = None
+        self.created_channels_DND_mythic = []
         self.created_channels_mythic = []
         self.created_channels_other = []
         self.created_channels_pvp = []
@@ -41,8 +42,6 @@ class ChannelManager(commands.Cog):
         for channel in self.bot.get_all_channels():
             if channel.type == discord.ChannelType.voice and '⚡ PvP blasten' in channel.name:
                 voice_channels.update({channel.name: channel})
-            elif channel.type == discord.ChannelType.voice and '🍻 Therapietheke' in channel.name:
-                self.after_pvp_channel = channel
             else:
                 continue
         return voice_channels
@@ -82,11 +81,10 @@ class ChannelManager(commands.Cog):
                                                                         category=self.categorychannel,
                                                                         position=self.m_position + i - 1,
                                                                         bitrate=96000)
-                    if self.main_pvp_channel is not None:
-                        if i == 2:
-                            await new_channel.move(before=m_channels[f'⏳ M+'])
-                        if i >= 3:
-                            await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'])
+                    if i == 2:
+                        await new_channel.move(before=m_channels[f'⏳ M+'])
+                    if i >= 3:
+                        await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'])
                     self.created_channels_mythic.append(new_channel)
                     created = True
                 else:
@@ -106,7 +104,7 @@ class ChannelManager(commands.Cog):
 
 
     async def create_dnd_mythic_channel(self):
-        m_channels = self.get_M_channels()
+        m_channels = self.get_DND_M_channels()
         empty_channels = 0
         deletable_channels = []
         if '⏳ M+ DND' not in m_channels.keys():
@@ -128,12 +126,12 @@ class ChannelManager(commands.Cog):
                                                                         position=self.dnd_m_position + i - 1,
                                                                         user_limit=5,
                                                                         bitrate=96000)
-                    if self.main_pvp_channel is not None:
-                        if i == 2:
-                            await new_channel.move(before=m_channels[f'⏳ M+ DND'])
-                        if i >= 3:
-                            await new_channel.move(before=m_channels[f'⏳ M+ {i-1} DND'])
-                    self.created_channels_mythic.append(new_channel)
+
+                    if i == 2:
+                        await new_channel.move(before=m_channels[f'⏳ M+ DND'])
+                    if i >= 3:
+                        await new_channel.move(before=m_channels[f'⏳ M+ {i-1} DND'])
+                    self.created_channels_DND_mythic.append(new_channel)
                     created = True
                 else:
                     i += 1
@@ -141,12 +139,12 @@ class ChannelManager(commands.Cog):
         i = 0
         while empty_channels > 1:
             channel = deletable_channels[i]
-            if channel in self.created_channels_mythic or not channel.name == '⏳ M+ DND':
+            if channel in self.created_channels_DND_mythic or not channel.name == '⏳ M+ DND':
                 await channel.delete()
                 empty_channels -= 1
                 deletable_channels.remove(channel)
-                if not self.created_channels_mythic == []:
-                    self.created_channels_mythic.remove(channel)
+                if not self.created_channels_DND_mythic == []:
+                    self.created_channels_DND_mythic.remove(channel)
             else:
                 i += 1
     async def create_pvp_channel(self):
