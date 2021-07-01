@@ -82,6 +82,7 @@ class ChannelManager(commands.Cog):
                                                                         position=self.m_position + i - 1,
                                                                         bitrate=96000)
                     if i == 2:
+                        print(m_channels['⏳ M+'])
                         await new_channel.move(before=m_channels['⏳ M+'], category=self.categorychannel)
                     if i >= 3:
                         await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'], category=self.categorychannel)
