@@ -22,7 +22,7 @@ class ChannelManager(commands.Cog):
     def get_M_channels(self):
         voice_channels = {}
         for channel in self.bot.get_all_channels():
-            if channel.type == discord.ChannelType.voice and '⏳ M+' in channel.name:
+            if channel.type == discord.ChannelType.voice and '⏳ M+' in channel.name and 'DND' not in channel.name:
                 voice_channels.update({channel.name: channel})
             else:
                 continue
