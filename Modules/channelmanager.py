@@ -82,7 +82,7 @@ class ChannelManager(commands.Cog):
                                                                         position=self.m_position + i - 1,
                                                                         bitrate=96000)
                     if i == 2:
-                        await new_channel.move(before=m_channels[f'⏳ M+'])
+                        await new_channel.move(before=m_channels['⏳ M+'])
                     if i >= 3:
                         await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'])
                     self.created_channels_mythic.append(new_channel)
@@ -128,7 +128,7 @@ class ChannelManager(commands.Cog):
                                                                         bitrate=96000)
 
                     if i == 2:
-                        await new_channel.move(before=m_channels[f'⏳ M+ DND'])
+                        await new_channel.move(before=m_channels['⏳ M+ DND'])
                     if i >= 3:
                         await new_channel.move(before=m_channels[f'⏳ M+ {i-1} DND'])
                     self.created_channels_DND_mythic.append(new_channel)
@@ -173,7 +173,7 @@ class ChannelManager(commands.Cog):
                                                                         bitrate=96000)
                     if self.after_pvp_channel is not None:
                         if i == 2:
-                            await new_channel.move(before=pvp_channels[f'⚡ PvP blasten'])
+                            await new_channel.move(before=pvp_channels['⚡ PvP blasten'])
                         if i >= 3:
                            await new_channel.move(before=pvp_channels[f'⚡ PvP blasten {i-1}'])
                     self.created_channels_pvp.append(new_channel)
