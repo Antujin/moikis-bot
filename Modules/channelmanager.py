@@ -31,7 +31,7 @@ class ChannelManager(commands.Cog):
         for channel in self.bot.get_all_channels():
             if channel.type == discord.ChannelType.voice and '⚡ PvP blasten' in channel.name:
                 voice_channels.update({channel.name: channel})
-            elif channel.type == discord.ChannelType.voice and channel.name == '🍻 Therapietheke':
+            elif channel.type == discord.ChannelType.voice and '🍻 Therapietheke' in channel.name:
                 self.after_pvp_channel = channel
             else:
                 continue
@@ -74,7 +74,10 @@ class ChannelManager(commands.Cog):
                                                                         user_limit=5,
                                                                         bitrate=96000)
                     if self.main_pvp_channel is not None:
-                        await new_channel.move(after=self.main_pvp_channel)
+                        if i == 2:
+                            await new_channel.move(before=m_channels[f'⏳ M+'])
+                        if i >= 3:
+                            await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'])
                     self.created_channels_mythic.append(new_channel)
                     created = True
                 else:
@@ -117,7 +120,10 @@ class ChannelManager(commands.Cog):
                                                                         category=self.categorychannel, position=self.pvp_position+i-1,
                                                                         bitrate=96000)
                     if self.after_pvp_channel is not None:
-                        await new_channel.move(after=self.after_pvp_channel)
+                        if i == 2:
+                            await new_channel.move(before=pvp_channels[f'⚡ PvP blasten'])
+                        if i >= 3:
+                           await new_channel.move(before=pvp_channels[f'⚡ PvP blasten {i-1}'])
                     self.created_channels_pvp.append(new_channel)
                     created = True
                 else:
