@@ -281,6 +281,7 @@ def export_data_to_google(event_id):
         return ['OK', date, f'https://docs.google.com/spreadsheets/d/{sh.id}/edit#gid={worksheet.id}', worksheet.title]
     except Exception as e:
         traceback.print_exc()
+        raise e
 
 
 if __name__ == '__main__':
