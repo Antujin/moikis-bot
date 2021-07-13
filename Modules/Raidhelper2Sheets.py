@@ -285,4 +285,5 @@ def export_data_to_google(event_id):
 
 
 if __name__ == '__main__':
-    export_data_to_google('862422922253041675')
+    r = export_data_to_google('862422922253041675')
+    print(r)
