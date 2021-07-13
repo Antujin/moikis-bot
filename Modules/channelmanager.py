@@ -79,13 +79,8 @@ class ChannelManager(commands.Cog):
                 if not new_channelname in m_channels.keys():
                     new_channel = await self.guild.create_voice_channel(name=new_channelname,
                                                                         category=self.categorychannel,
-                                                                        position=self.m_position + i - 1,
+                                                                        position=self.m_position,
                                                                         bitrate=96000)
-                    #if i == 2:
-                    #    print(m_channels['⏳ M+'])
-                    #    await new_channel.move(before=m_channels['⏳ M+'], category=self.categorychannel)
-                    #if i >= 3:
-                    #    await new_channel.move(before=m_channels[f'⏳ M+ {i-1}'], category=self.categorychannel)
                     self.created_channels_mythic.append(new_channel)
                     created = True
                 else:
@@ -109,7 +104,7 @@ class ChannelManager(commands.Cog):
         empty_channels = 0
         deletable_channels = []
         if '⏳ M+ DND' not in m_channels.keys():
-            await self.guild.create_voice_channel(name='⏳ M+ DND', category=self.categorychannel, position=2+len(self.get_M_channels()), user_limit=5, bitrate=96000)
+            await self.guild.create_voice_channel(name='⏳ M+ DND', category=self.categorychannel, position=3, user_limit=5, bitrate=96000)
             return
         self.dnd_m_position = m_channels['⏳ M+ DND'].position
         for channelname in m_channels.keys():
@@ -124,14 +119,9 @@ class ChannelManager(commands.Cog):
                 if not new_channelname in m_channels.keys():
                     new_channel = await self.guild.create_voice_channel(name=new_channelname,
                                                                         category=self.categorychannel,
-                                                                        position=self.dnd_m_position + i - 1,
+                                                                        position=self.dnd_m_position,
                                                                         user_limit=5,
                                                                         bitrate=96000)
-
-                    #if i == 2:
-                    #    await new_channel.move(before=m_channels['⏳ M+ DND'], category=self.categorychannel)
-                    #if i >= 3:
-                    #    await new_channel.move(before=m_channels[f'⏳ M+ {i-1} DND'], category=self.categorychannel)
                     self.created_channels_DND_mythic.append(new_channel)
                     created = True
                 else:
@@ -153,8 +143,10 @@ class ChannelManager(commands.Cog):
         empty_channels = 0
         deletable_channels = []
         if '⚡ PvP blasten' not in pvp_channels.keys():
-            self.main_pvp_channel = await self.guild.create_voice_channel(name='⚡ PvP blasten', category=self.categorychannel, position=2+len(self.get_M_channels())+len(self.get_DND_M_channels()),
-                                                 bitrate=96000)
+            self.main_pvp_channel = await self.guild.create_voice_channel(name='⚡ PvP blasten',
+                                                                          category=self.categorychannel,
+                                                                          position=4,
+                                                                          bitrate=96000)
             return
         if self.main_pvp_channel is None:
             self.main_pvp_channel = pvp_channels['⚡ PvP blasten']
@@ -170,13 +162,9 @@ class ChannelManager(commands.Cog):
                 new_channelname = f'⚡ PvP blasten {i}'
                 if not new_channelname in pvp_channels.keys():
                     new_channel = await self.guild.create_voice_channel(name=new_channelname,
-                                                                        category=self.categorychannel, position=self.pvp_position+i-1,
+                                                                        category=self.categorychannel,
+                                                                        position=self.pvp_position,
                                                                         bitrate=96000)
-                    #if self.after_pvp_channel is not None:
-                    #    if i == 2:
-                    #        await new_channel.move(before=pvp_channels['⚡ PvP blasten'], category=self.categorychannel)
-                    #    if i >= 3:
-                   #        await new_channel.move(before=pvp_channels[f'⚡ PvP blasten {i-1}'], category=self.categorychannel)
                     self.created_channels_pvp.append(new_channel)
                     created = True
                 else:
