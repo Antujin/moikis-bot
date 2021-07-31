@@ -21,9 +21,10 @@ class ExportRaidHelper(commands.Cog):
         if response[0] == 'OK':
             await ctx.send(
                 f'Anmeldungen für {response[1].strftime("%A den %d.%m.%Y")} erfolgreich exportiert. Hier der Link: {response[2]} \n Um den Kader zu veröffentlichen den folgenden Befehl ausführen: $ExportKader "{response[3]}"')
+            await progress.delete()
+
         else:
             await ctx.send('Es ist ein Fehler aufgetreten. Bitte melde dich bei <@!269164316832432128>')
-        await progress.delete()
 
     @commands.command()
     @is_in_channel('offi-chat')

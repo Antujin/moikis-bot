@@ -74,6 +74,7 @@ def read_data_from_api(event_id):
     auth_token = os.environ.get('RAIDHELPER_BEARER_TOKEN')
     headers = {'authorization': f'Bearer {auth_token}'}
     response = requests.get(url=url, headers=headers).json()
+    print(response)
     #print(response.json()['raidusers'])
     raw_date = response['raids']['date']
     raw_time = response['raids']['time']
@@ -100,7 +101,7 @@ def read_csv_data(csv_file, event_id_Umfrage=None):
             elif i == 1:
                 raw_date = line[1]
                 raw_time = line[2]
-                date = datetime.datetime.strptime(raw_date+'+'+raw_time,'%m-%d-%Y+%H:%M')
+                date = datetime.datetime.strptime(raw_date + '+' + raw_time, '%d-%m-%Y+%H:%M')
                 continue
             elif i < 4:
                 continue
@@ -125,7 +126,7 @@ def read_csv_data(csv_file, event_id_Umfrage=None):
 def export_data_to_google(event_id):
     try:
         gc = gspread.service_account()
-        #data, date = read_csv_data(csv_file)
+        #data, date = read_csv_data(event_id)
         data, date = read_data_from_api(event_id)
         sh = gc.open('Mah Oida Raidplanung')
         worksheet_old = sh.sheet1
@@ -280,3 +281,9 @@ def export_data_to_google(event_id):
         return ['OK', date, f'https://docs.google.com/spreadsheets/d/{sh.id}/edit#gid={worksheet.id}', worksheet.title]
     except Exception as e:
         traceback.print_exc()
+        raise e
+
+
+if __name__ == '__main__':
+    r = export_data_to_google('862422922253041675')
+    print(r)
