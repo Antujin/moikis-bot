@@ -15,7 +15,7 @@ class ExportRaidHelper(commands.Cog):
     @commands.command()
     @is_in_channel('offi-chat')
     async def ExportEvent(self, ctx, eventID):
-        progress = await ctx.send(f'Export gestartet.')
+        progress = await ctx.send('Export gestartet.')
         response = Raidhelper2Sheets.export_data_to_google(eventID)
         print(response)
         if response[0] == 'OK':
@@ -29,7 +29,7 @@ class ExportRaidHelper(commands.Cog):
     @commands.command()
     @is_in_channel('offi-chat')
     async def ExportKader(self, ctx, sheet_name):
-        progress = await ctx.send(f'Veröffentlichung gestartet.')
+        progress = await ctx.send('Veröffentlichung gestartet.')
         response = PublishSheets.publishsheets(sheet_name)
         if response[0] == 'OK':
             channel = discord.utils.get(ctx.guild.channels, name='kader')
@@ -46,8 +46,13 @@ class ExportRaidHelper(commands.Cog):
                               description=question,
                               color=0x0000ff)
         for answer in answers.keys():
-            embed.add_field(name=f' {answers[answer]["text"]}: {answers[answer]["count"]} Stimmmen ({round(answers[answer]["count"]/total_responses*100,2)}%)',
+            if answers[answer]['voters'] == []:
+                 embed.add_field(name=f' {answers[answer]["text"]}: {answers[answer]["count"]} Stimmmen ({round(answers[answer]["count"]/total_responses*100,2)}%)',
+                            value='/', inline=True)
+            else:
+                embed.add_field(name=f' {answers[answer]["text"]}: {answers[answer]["count"]} Stimmmen ({round(answers[answer]["count"]/total_responses*100,2)}%)',
                             value='\n'.join(answers[answer]['voters']), inline=True)
+                     
 
         await ctx.send(f"Ausgewertet am {datetime.datetime.now().strftime('%d.%m.%Y um %H:%M Uhr')}", embed=embed)
 
