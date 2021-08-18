@@ -10,6 +10,7 @@ from Modules.ExportRaidHelper import ExportRaidHelper
 from Modules.channelmanager import ChannelManager
 from Modules.feedback import Feedback
 from Modules.RoleManagement import RoleManager
+from Modules.Voting import Voting
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
@@ -32,6 +33,7 @@ bot.add_cog(ExportRaidHelper(bot))
 bot.add_cog(Feedback(bot))
 bot.add_cog(ChannelManager(bot))
 bot.add_cog(RoleManager(bot))
+bot.add_cog(Voting(bot))
 
 DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
 if DISCORD_TOKEN == None:
