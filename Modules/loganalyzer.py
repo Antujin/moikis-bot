@@ -26,18 +26,20 @@ class LogAnalyzer:
         self.token = self.get_access_token()
 
     def get_boss_fights(self, report_id):
-        query = '{reportData {report(code: "%s" ) {fights(killType: Encounters) {id,name,startTime,endTime,kill,friendlyPlayers}}}}' % report_id
+        query = f'{{reportData {{report(code: "{report_id}" ) {{fights(killType: Encounters) {{id,name,startTime,endTime,kill,friendlyPlayers}} }} }} }}'
+        print(query)
         resp = self.send_query(query)
         json_data = json.loads(resp.text)
         df_data = json_data['data']['reportData']['report']['fights']
         return pd.DataFrame(df_data)
 
-    def get_pot_usage(self, report_id, starttime, endtime):
+    def get_pot_usage(self, report_id, starttime, endtime, fight_ids):
         df = pd.DataFrame()
         for i, ability in enumerate(pots.keys()):
-            query = '{reportData {report(code: "%s") {events(startTime: %i, endTime: %i, abilityID: %i, dataType: Healing) {data}}}}' % (report_id, starttime, endtime, ability)
+            query = f'{{reportData {{report(code: "{report_id}") {{events(startTime: {starttime}, endTime: {endtime}, abilityID: {ability}, fightIDs: {fight_ids}, dataType: Healing) {{data}} }} }} }}'
+            #print(query)
             resp = self.send_query(query)
-            print(resp.text)
+            #print(resp.text)
             json_data = json.loads(resp.text)
             df_data = json_data['data']['reportData']['report']['events']["data"]
             df_new = pd.DataFrame(df_data)
@@ -53,15 +55,27 @@ class LogAnalyzer:
             return requests.post(self.api_url, json={'query': query},
                                  headers={"Authorization": f'{self.token["token_type"]} {self.token["access_token"]}'})
 
+    def get_player_data(self, report_id):
+        query = f'{{reportData {{report(code: "{report_id}") {{masterData(translate: false) {{actors(type: "Player") {{id, name}} }} }} }} }}'
+        resp = self.send_query(query)
+        json_data = json.loads(resp.text)
+        df_data = json_data['data']['reportData']['report']['masterData']['actors']
+        return pd.DataFrame(df_data)
+
 
 
 if __name__ == '__main__':
     analyzer = LogAnalyzer()
-    print(analyzer.token)
     df_boss_fights = analyzer.get_boss_fights("f79HjvywxP1QqAbG")
-    used_pots = pd.DataFrame()
-    for i in range(len(df_boss_fights.index)):
-        test_fight = df_boss_fights.loc[i]
-        used_pots_this_fight = analyzer.get_pot_usage("f79HjvywxP1QqAbG", test_fight['startTime'], test_fight['endTime'])
-        used_pots = pd.concat([used_pots,used_pots_this_fight], ignore_index=True)
-    print(used_pots)
+    df_player_data = analyzer.get_player_data("f79HjvywxP1QqAbG")
+    print(df_boss_fights[['id', 'name']])
+    fightcount = df_boss_fights.index
+    used_pots = analyzer.get_pot_usage("f79HjvywxP1QqAbG", df_boss_fights.loc[0,'startTime'], df_boss_fights.loc[fightcount.stop-1, 'endTime'], df_boss_fights.loc[:, 'id'].to_numpy())
+    print(used_pots.keys())
+    groups = used_pots.groupby('fight').groups
+    for group in groups.keys():
+        locs = groups[group]
+        for loc in locs:
+            pot_user = used_pots.loc[loc, ['fight', 'sourceID']].to_numpy()
+            player_name = str(df_player_data[df_player_data['id'] == pot_user[1]]['name'].iloc[0])
+            print(f"{df_boss_fights[df_boss_fights['id'] == pot_user[0]]['name'].iloc[0]}: Player '{player_name}' used a healthpot")
