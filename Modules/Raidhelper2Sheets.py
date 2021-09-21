@@ -8,6 +8,7 @@ import numpy as np
 import requests
 from gspread_formatting import *
 import os
+from dateutil import parser
 
 border_fmt = Borders(top=Border('Solid'), bottom=Border('Solid'), right=Border('solid'), left=Border('solid'))
 heading_format = cellFormat(borders=border_fmt,
@@ -85,7 +86,7 @@ def read_data_from_api(event_id):
                                         'role': user['role'],
                                         'color': class_color[user['spec']],
                                         'name': user['username'].replace('**',''),
-                                        'signup time': datetime.datetime.strptime(user['entrydate'],'%Y-%m-%dT%H:%M:%S.%f'),
+                                        'signup time': parser.parse(user['entrydate']),
                                         }
                        }
                        )
