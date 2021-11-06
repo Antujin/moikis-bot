@@ -153,16 +153,26 @@ def export_data_to_google(event_id):
         fmt_dict = {}
         for i,key in enumerate(data.keys()):
             fmt = cellFormat(backgroundColor=data[key]['color'], borders=border_fmt)
+            print(data[key]['name'], data[key]['role'])
             if data[key]['role'] == 'Tanks':
                 tanks.append(data[key]['name'])
                 fmt_dict.update({key: fmt})
+            elif data[key]['role'] == 'Tank':
+                tanks.append(data[key]['name'])
+                fmt_dict.update({key: fmt})
             elif data[key]['role'] == 'Healers':
+                healer.append(data[key]['name'])
+                fmt_dict.update({key: fmt})
+            elif data[key]['role'] == 'Healer':
                 healer.append(data[key]['name'])
                 fmt_dict.update({key: fmt})
             elif data[key]['role'] == 'Ranged':
                 ranges.append(data[key]['name'])
                 fmt_dict.update({key: fmt})
             elif data[key]['role'] == 'Melee':
+                melees.append(data[key]['name'])
+                fmt_dict.update({key: fmt})
+            elif data[key]['role'] == 'Melees':
                 melees.append(data[key]['name'])
                 fmt_dict.update({key: fmt})
             elif data[key]['role'] == 'Absence':
@@ -286,5 +296,5 @@ def export_data_to_google(event_id):
 
 
 if __name__ == '__main__':
-    r = export_data_to_google('862422922253041675')
+    r = export_data_to_google('904475033521504306')
     print(r)
